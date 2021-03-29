@@ -55,11 +55,95 @@ hospialization_needed = confirmed.copy()
 for day in range(0, len(confirmed)):
     hospialization_needed.iloc[day] = active_cases.iloc[day] * hospialization_rate_estimate
 
-# visualization
+# VISUALIZATION
 
 countries = ['Italy', 'Poland', 'Germany', 'Spain', 'Austria']
 
-for country in countries:
-    confirmed[country].plot(label=country)
-plt.legend(loc='upper left')
-plt.show()
+def confirmed_cases_plot():
+    ax = plt.subplot()
+    ax.set_facecolor('black')
+    ax.figure.set_facecolor('#121212')
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
+    ax.set_title('Covid-19 - total confirmed cases by country', color='white')
+
+    for country in countries:
+        confirmed[country][-90:].plot(label=country)
+
+    plt.legend(loc='upper left')
+    plt.show()
+
+#confirmed_cases_plot()
+
+def confirmed_cases_hist():
+    for country in countries:
+        ax = plt.subplot()
+        ax.set_facecolor('black')
+        ax.figure.set_facecolor('#121212')
+        ax.tick_params(axis='x', colors='white')
+        ax.tick_params(axis='y', colors='white')
+        ax.set_title(f'Covid-19 - confirmed cases rate {country}', color='white')
+        growth_rate[country][-60:].plot.bar()
+        plt.show()
+
+#confirmed_cases_hist()
+
+def total_death_plot():
+    ax = plt.subplot()
+    ax.set_facecolor('black')
+    ax.figure.set_facecolor('#121212')
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
+    ax.set_title('Covid-19 - total deaths by country', color='white')
+
+    for country in countries:
+        deaths[country][-90:].plot(label=country)
+
+    plt.legend(loc='upper left')
+    plt.show()
+
+#total_death_plot()
+
+def deaths_rate_hist():
+    for country in countries:
+        ax = plt.subplot()
+        ax.set_facecolor('black')
+        ax.figure.set_facecolor('#121212')
+        ax.tick_params(axis='x', colors='white')
+        ax.tick_params(axis='y', colors='white')
+        ax.set_title(f'Covid-19 - total deaths {country}', color='white')
+        death_rate[country].plot.bar()
+        plt.show()
+
+#deaths_rate_hist()
+
+simulated_growth_rate = 0.1
+
+dates = pd.date_range(start='3/27/2021', periods=40, freq='D')
+dates = pd.Series(dates)
+dates = dates.dt.strftime('%m/%d/%Y')
+
+simulated = confirmed.copy()
+simulated = simulated.append(pd.DataFrame(index=dates))
+#print(simulated)
+
+def simulation_plot():
+    for day in range(len(confirmed), len(confirmed)+40):
+        simulated.iloc[day] = simulated.iloc[day - 1] * (1 + simulated_growth_rate)
+
+    ax = plt.subplot()
+    ax.set_facecolor('black')
+    ax.figure.set_facecolor('#121212')
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
+    ax.set_title('Future simulation for Poland', color='white')
+    simulated['Poland'].plot()
+    plt.show()
+#simulation_plot()
+
+
+estimated_death_rate = 0.025
+
+# infected * death_rate - deaths
+# infected = deaths / death_rate
+print(deaths['Italy'].tail()[4] / estimated_death_rate)
